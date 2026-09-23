@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head><title>Teacher Dashboard</title></head>
+<body>
+    <h1>Welcome, Teacher ({{ request.user.username }})</h1>
+    <h3>My Classes:</h3>
+    <ul>
+        {% for c in my_classes %}
+            <li>{{ c }}</li>
+        {% empty %}
+            <li>No classes assigned yet.</li>
+        {% endfor %}
+    </ul>
+    <p><a href="{% url 'logout' %}">Logout</a></p>
+</body>
+</html>

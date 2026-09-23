@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head><title>Parent Dashboard</title></head>
+<body>
+    <h1>Welcome, Parent ({{ request.user.username }})</h1>
+    <h3>My Children:</h3>
+    <ul>
+        {% for child in my_children %}
+            <li>{{ child }} - Class: {{ child.school_class }}</li>
+        {% empty %}
+            <li>No children linked yet.</li>
+        {% endfor %}
+    </ul>
+    <p><a href="{% url 'logout' %}">Logout</a></p>
+</body>
+</html>
