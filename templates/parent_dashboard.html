@@ -3,14 +3,35 @@
 <head><title>Parent Dashboard</title></head>
 <body>
     <h1>Welcome, Parent ({{ request.user.username }})</h1>
-    <h3>My Children:</h3>
-    <ul>
-        {% for child in my_children %}
-            <li>{{ child }} - Class: {{ child.school_class }}</li>
-        {% empty %}
-            <li>No children linked yet.</li>
-        {% endfor %}
-    </ul>
+
+    {% for data in children_data %}
+        <hr>
+        <h2>{{ data.student }} — {{ data.student.school_class }}</h2>
+        <p>Blood Group: {{ data.student.blood_group }}</p>
+
+        <h4>Recent Attendance</h4>
+        <ul>
+            {% for a in data.attendance %}<li>{{ a.date }} - {{ a.status }}</li>{% endfor %}
+        </ul>
+
+        <h4>Homework</h4>
+        <ul>
+            {% for h in data.homework %}<li>{{ h.subject }}: {{ h.title }} (due {{ h.due_date }})</li>{% endfor %}
+        </ul>
+
+        <h4>Exam Results</h4>
+        <ul>
+            {% for r in data.results %}<li>{{ r.exam }} - {{ r.subject }}: {{ r.marks_obtained }}/{{ r.max_marks }}</li>{% endfor %}
+        </ul>
+
+        <h4>Monthly Performance</h4>
+        <ul>
+            {% for p in data.performance %}<li>{{ p.month|date:"F Y" }}: {{ p.average_score }}%</li>{% endfor %}
+        </ul>
+    {% empty %}
+        <p>No children linked yet.</p>
+    {% endfor %}
+
     <p><a href="{% url 'logout' %}">Logout</a></p>
 </body>
 </html>
