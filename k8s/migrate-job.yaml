@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate
+spec:
+  backoffLimit: 6
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate
+          image: school-app:local
+          imagePullPolicy: IfNotPresent
+          command: ["python", "manage.py", "migrate"]
+          envFrom:
+            - configMapRef:
+                name: school-config
+            - secretRef:
+                name: school-secrets

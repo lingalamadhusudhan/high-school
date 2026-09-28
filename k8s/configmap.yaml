@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: school-config
+data:
+  DEBUG: "False"
+  DB_NAME: schoolapp
+  DB_HOST: postgres
+  DB_PORT: "5432"
