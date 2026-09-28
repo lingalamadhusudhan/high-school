@@ -19,6 +19,7 @@ Main modules:
 
 from pathlib import Path
 import sys
+from decouple import Csv, config
 
 
 # ============================================================
@@ -32,16 +33,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY
 # ============================================================
 
-# Development key only.
-# Use an environment variable before production deployment.
-SECRET_KEY = "django-insecure-default-key-change-in-production"
+# Dummy default allows 'collectstatic' to run during docker build without errors
+SECRET_KEY = config(
+    "SECRET_KEY",
+    default="django-insecure-build-dummy-key-change-in-production",
+)
 
-DEBUG = True
+DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = [
-    "127.0.0.1",
-    "localhost",
-]
+ALLOWED_HOSTS = config(
+    "ALLOWED_HOSTS",
+    default="127.0.0.1,localhost",
+    cast=Csv(),
+)
 
 
 # ============================================================
@@ -101,16 +105,10 @@ ROOT_URLCONF = "schoolapp.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-
-        # Main project templates directory:
-        # high-school/templates/
         "DIRS": [
             BASE_DIR / "templates",
         ],
-
-        # Also search templates inside installed Django apps.
         "APP_DIRS": True,
-
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
@@ -130,13 +128,18 @@ WSGI_APPLICATION = "schoolapp.wsgi.application"
 
 
 # ============================================================
-# DATABASE
+# DATABASE (PostgreSQL)
 # ============================================================
 
+# Fallback values prevent build crashes when .env is not present at image build time
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config("DB_NAME", default="school_db"),
+        "USER": config("DB_USER", default="postgres"),
+        "PASSWORD": config("DB_PASSWORD", default="postgres"),
+        "HOST": config("DB_HOST", default="localhost"),
+        "PORT": config("DB_PORT", default="5432"),
     }
 }
 
@@ -145,9 +148,7 @@ DATABASES = {
 # TEST DATABASE
 # ============================================================
 
-# Use a temporary in-memory SQLite database when pytest runs.
-# This prevents tests from changing the normal development DB.
-
+# Use SQLite in-memory database during test runs for fast execution
 if "pytest" in sys.modules or any("pytest" in arg for arg in sys.argv):
     DATABASES["default"] = {
         "ENGINE": "django.db.backends.sqlite3",
@@ -211,7 +212,6 @@ LOGOUT_REDIRECT_URL = "login"
 
 LANGUAGE_CODE = "en-us"
 
-# India school application
 TIME_ZONE = "Asia/Kolkata"
 
 USE_I18N = True
@@ -249,7 +249,6 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
     ],
-
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
